@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docker-k8s-productservice
+  labels:
+    app: docker-k8s-productservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docker-k8s-productservice
+  template:
+    metadata:
+      labels:
+        app: docker-k8s-productservice
+    spec:
+      containers:
+        - name: docker-k8s-productservice
+            image: it19212982/productservice
+            ports:
+              - containerPort: 8080
