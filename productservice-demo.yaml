@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: docker-k8s-productservice
-            image: it19212982/productservice
-            ports:
-              - containerPort: 8080
+          image: it19212982/productservice
+          ports:
+            - containerPort: 8080
