@@ -36,20 +36,33 @@ jobs:
         dockerfile: Dockerfile
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-  Deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
-    - name: kubectl - Google Cloud GKE cluster
-      uses: ameydev/gke-kubectl-action@master
-      env:
-        PROJECT_ID: ${{ env.PROJECT_ID }}
-        APPLICATION_CREDENTIALS: ${{ secrets.GKE_SA_KEY }}
-        CLUSTER_NAME: ${{ env.GKE_CLUSTER }}
-        ZONE_NAME: ${{ env.GKE_ZONE }}
+    - name: Building Docker Image
+      run: docker build . --file Dockerfile --tag it19212982/productservice
+
+    - name: Pushing Docker Image to Docker Hub
+      run: docker push it19212982/productservice
+
+
+    - id: "auth"
+      uses: google-github-actions/auth@v0
       with:
-        args: get pods
+        credentials_json: ${{ secrets.GKE_SA_KEY }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v0
+
+      # Setup gcloud CLI
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v0
+
+    - name: Use GCloud CLI
+      run: gcloud info
+
+      # Get the GKE credentials so we can deploy to the cluster
+    - run: gcloud container clusters get-credentials ${{ env.GKE_CLUSTER }} --zone ${{ env.GKE_ZONE }}
+
+    - name: Deploy
+      run: kubectl apply -f productservice-demo.yaml
 
 
 
